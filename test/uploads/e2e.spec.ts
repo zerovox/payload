@@ -46,6 +46,16 @@ describe('uploads', () => {
     await expect(field).toContainText('image.png');
   });
 
+  test('should set defaultValue in fields in create new upload modal', async () => {
+    await page.goto(relationURL.create);
+
+    await page.locator('#upload-new-image').click();
+
+    const field = page.locator('#field-defaultValueText');
+
+    await expect(field).toHaveValue('default');
+  });
+
   test('should show upload filename in upload collection list', async () => {
     await page.goto(mediaURL.list);
 

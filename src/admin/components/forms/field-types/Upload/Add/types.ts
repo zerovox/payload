@@ -2,7 +2,7 @@ import { SanitizedCollectionConfig } from '../../../../../../collections/config/
 import { FieldTypes } from '../..';
 
 export type Props = {
-  setValue: (val: { id: string } | null) => void
+  setValue: (val: { id?: string } | null) => void
   collection: SanitizedCollectionConfig
   slug: string
   fieldTypes: FieldTypes

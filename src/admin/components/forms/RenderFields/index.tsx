@@ -20,6 +20,8 @@ const RenderFields: React.FC<Props> = (props) => {
     readOnly: readOnlyOverride,
     className,
     forceRender,
+    // TODO: get state to work for setting values in fields
+    state = {},
   } = props;
 
   const [hasRendered, setHasRendered] = useState(Boolean(forceRender));
@@ -88,6 +90,8 @@ const RenderFields: React.FC<Props> = (props) => {
                         DefaultComponent={FieldComponent}
                         componentProps={{
                           ...field,
+                          // TODO: not working
+                          value: state[field.path],
                           path: field.path || (isFieldAffectingData ? field.name : undefined),
                           fieldTypes,
                           admin: {

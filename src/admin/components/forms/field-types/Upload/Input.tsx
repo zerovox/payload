@@ -129,6 +129,7 @@ const UploadInput: React.FC<UploadInputProps> = (props) => {
           {(!file || missingFile) && (
             <div className={`${baseClass}__wrap`}>
               <Button
+                id={`upload-new-${path.replace(/\./gi, '__')}`}
                 buttonStyle="secondary"
                 onClick={() => {
                   toggle(addModalSlug);
