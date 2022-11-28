@@ -310,7 +310,7 @@ export type RichTextCustomLeaf = {
 }
 
 export type RichTextElement = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote' | 'ul' | 'ol' | 'link' | 'relationship' | 'upload' | 'indent' | RichTextCustomElement;
-export type RichTextLeaf = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | RichTextCustomLeaf;
+export type RichTextLeaf = 'bold' | 'italic' | 'leftAlign' | 'centerAlign' | 'rightAlign' | 'underline' | 'strikethrough' | 'code' | RichTextCustomLeaf;
 
 export type RichTextField = FieldBase & {
   type: 'richText';

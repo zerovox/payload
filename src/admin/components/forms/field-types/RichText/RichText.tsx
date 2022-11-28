@@ -27,7 +27,7 @@ import { getTranslation } from '../../../../../utilities/getTranslation';
 import './index.scss';
 
 const defaultElements: RichTextElement[] = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'indent', 'link', 'relationship', 'upload'];
-const defaultLeaves: RichTextLeaf[] = ['bold', 'italic', 'underline', 'strikethrough', 'code'];
+const defaultLeaves: RichTextLeaf[] = ['bold', 'italic', 'leftAlign', 'centerAlign', 'rightAlign', 'underline', 'strikethrough', 'code'];
 
 const baseClass = 'rich-text';
 type CustomText = { text: string;[x: string]: unknown }
