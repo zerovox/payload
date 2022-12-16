@@ -30,8 +30,10 @@ import Logger from './utilities/logger';
 import { getDataLoader } from './collections/dataloader';
 import mountEndpoints from './express/mountEndpoints';
 import PreferencesModel from './preferences/model';
+import { timeStamp } from './utilities/timeStamp';
 
 export const init = (payload: Payload, options: InitOptions): void => {
+  const bootTime = new Date();
   payload.logger.info('Starting Payload...');
   if (!options.secret) {
     throw new Error(
@@ -49,10 +51,11 @@ export const init = (payload: Payload, options: InitOptions): void => {
     .update(options.secret)
     .digest('hex')
     .slice(0, 32);
+  timeStamp('crypto', bootTime);
 
   payload.local = options.local;
 
-  payload.config = loadConfig(payload.logger);
+  payload.config = loadConfig(payload.logger, bootTime);
 
   // If not initializing locally, scaffold router
   if (!payload.local) {
@@ -60,14 +63,15 @@ export const init = (payload: Payload, options: InitOptions): void => {
     payload.router.use(...expressMiddleware(payload));
     initAuth(payload);
   }
-
   // Configure email service
   payload.email = buildEmail(payload.emailOptions, payload.logger);
+  timeStamp('buildEmail', bootTime);
   payload.sendEmail = sendEmail.bind(payload);
 
   // Initialize collections & globals
   initCollections(payload);
   initGlobals(payload);
+  timeStamp('mongoose models initialized', bootTime);
 
   if (!payload.config.graphQL.disable) {
     registerSchema(payload);
@@ -75,6 +79,7 @@ export const init = (payload: Payload, options: InitOptions): void => {
 
   payload.preferences = { Model: PreferencesModel };
 
+  timeStamp('graphql schema registered', bootTime);
   // If not initializing locally, set up HTTP routing
   if (!payload.local) {
     options.express.use((req: PayloadRequest, res, next) => {
@@ -129,6 +134,7 @@ export const init = (payload: Payload, options: InitOptions): void => {
   }
 
   serverInitTelemetry(payload);
+  timeStamp('server telemetry', bootTime);
 };
 
 export const initAsync = async (payload: Payload, options: InitOptions): Promise<void> => {

@@ -14,8 +14,9 @@ export function buildConfig(config: Config): SanitizedConfig {
       (updatedConfig, plugin) => plugin(updatedConfig),
       config,
     );
-
+    // TODO plugins init timestamp
     const sanitizedConfig = sanitize(configWithPlugins);
+    // TODO sanitize config timestamp
 
     return sanitizedConfig;
   }

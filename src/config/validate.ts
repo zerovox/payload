@@ -8,6 +8,7 @@ import fieldSchema, { idField } from '../fields/config/schema';
 import { SanitizedGlobalConfig } from '../globals/config/types';
 import globalSchema from '../globals/config/schema';
 import { fieldAffectsData } from '../fields/config/types';
+import { timeStamp } from '../utilities/timeStamp';
 
 const validateFields = (context: string, entity: SanitizedCollectionConfig | SanitizedGlobalConfig): string[] => {
   const errors: string[] = [];
@@ -32,8 +33,9 @@ const validateFields = (context: string, entity: SanitizedCollectionConfig | San
   return errors;
 };
 
-const validateCollections = (collections: SanitizedCollectionConfig[]): string[] => {
+const validateCollections = (collections: SanitizedCollectionConfig[], bootTime: Date): string[] => {
   const errors: string[] = [];
+  timeStamp('start collections validation', bootTime);
   collections.forEach((collection) => {
     const result = collectionSchema.validate(collection, { abortEarly: false });
     if (result.error) {
@@ -43,12 +45,14 @@ const validateCollections = (collections: SanitizedCollectionConfig[]): string[]
     }
     errors.push(...validateFields('Collection', collection));
   });
+  timeStamp('end collections validation', bootTime);
 
   return errors;
 };
 
-const validateGlobals = (globals: SanitizedGlobalConfig[]): string[] => {
+const validateGlobals = (globals: SanitizedGlobalConfig[], bootTime: Date): string[] => {
   const errors: string[] = [];
+  timeStamp('start globals validation', bootTime);
   globals.forEach((global) => {
     const result = globalSchema.validate(global, { abortEarly: false });
     if (result.error) {
@@ -58,18 +62,19 @@ const validateGlobals = (globals: SanitizedGlobalConfig[]): string[] => {
     }
     errors.push(...validateFields('Global', global));
   });
+  timeStamp('end globals validation', bootTime);
 
   return errors;
 };
 
-const validateSchema = (config: SanitizedConfig, logger: Logger): SanitizedConfig => {
+const validateSchema = (config: SanitizedConfig, logger: Logger, bootTime: Date): SanitizedConfig => {
   const result = schema.validate(config, {
     abortEarly: false,
   });
 
   const nestedErrors = [
-    ...validateCollections(config.collections),
-    ...validateGlobals(config.globals),
+    ...validateCollections(config.collections, bootTime),
+    ...validateGlobals(config.globals, bootTime),
   ];
 
   if (result.error || nestedErrors.length > 0) {
