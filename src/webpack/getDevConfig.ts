@@ -1,23 +1,16 @@
 import webpack, { Configuration } from 'webpack';
 import { SanitizedConfig } from '../config/types';
-import getBaseConfig from './getBaseConfig';
+import getBaseWebpackConfig, { pathToAdminFolder } from './getBaseConfig';
 
 export default (payloadConfig: SanitizedConfig): Configuration => {
-  const baseConfig = getBaseConfig(payloadConfig) as any;
+  const baseConfig = getBaseWebpackConfig(payloadConfig) as any;
 
-  let config: Configuration = {
+  let webpackConfig: Configuration = {
     ...baseConfig,
-    cache: {
-      type: 'filesystem',
-      buildDependencies: {
-        config: [__filename],
-      },
-    },
     entry: {
-      ...baseConfig.entry,
       main: [
         require.resolve('webpack-hot-middleware/client'),
-        ...(baseConfig.entry.main as string[]),
+        pathToAdminFolder,
       ],
     },
     output: {
@@ -25,36 +18,47 @@ export default (payloadConfig: SanitizedConfig): Configuration => {
       path: '/',
       filename: '[name].js',
     },
-    devtool: 'inline-source-map',
     mode: 'development',
     stats: 'errors-warnings',
+    devtool: 'inline-source-map',
     plugins: [
       ...baseConfig.plugins,
       new webpack.HotModuleReplacementPlugin(),
     ],
-  };
-
-  config.module.rules.push({
-    test: /\.(scss|css)$/,
-    sideEffects: true,
-    use: [
-      require.resolve('style-loader'),
-      require.resolve('css-loader'),
-      {
-        loader: require.resolve('postcss-loader'),
-        options: {
-          postcssOptions: {
-            plugins: [require.resolve('postcss-preset-env')],
+    optimization: {
+      splitChunks: {
+        chunks: 'async',
+        minSize: 20000,
+        minRemainingSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        enforceSizeThreshold: 50000,
+        cacheGroups: {
+          defaultVendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
           },
         },
       },
-      require.resolve('sass-loader'),
-    ],
-  });
+    },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
+  };
 
   if (payloadConfig.admin.webpack && typeof payloadConfig.admin.webpack === 'function') {
-    config = payloadConfig.admin.webpack(config);
+    webpackConfig = payloadConfig.admin.webpack(webpackConfig);
   }
 
-  return config;
+  return webpackConfig;
 };

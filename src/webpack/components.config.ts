@@ -3,6 +3,11 @@ import MiniCSSExtractPlugin from 'mini-css-extract-plugin';
 import TerserJSPlugin from 'terser-webpack-plugin';
 import OptimizeCSSAssetsPlugin from 'css-minimizer-webpack-plugin';
 
+// -----------------------------------------------------------
+// Transpile's admin components into a single CommonJS file.
+// Located at <root>/components/index.js
+// -----------------------------------------------------------
+
 export default {
   entry: {
     main: [path.resolve(__dirname, '../admin/components/index.js')],

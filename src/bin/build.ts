@@ -5,11 +5,30 @@ import webpack from 'webpack';
 import getWebpackProdConfig from '../webpack/getProdConfig';
 import findConfig from '../config/find';
 import loadConfig from '../config/load';
+import { buildServerPayloadConfig } from '../webpack/buildServerPayloadConfig';
 
 const configPath = findConfig();
 
+export const buildServerConfig = (): void => {
+  console.log('Building server config...');
+  webpack(buildServerPayloadConfig(configPath), (err, stats) => {
+    console.log('Built server config');
+    if (err || stats.hasErrors()) {
+      if (stats) {
+        console.error(stats.toString({
+          chunks: false,
+          colors: true,
+        }));
+      } else {
+        console.error(err.message);
+      }
+    }
+  });
+};
+
 export const build = (): void => {
   try {
+    // buildServerConfig();
     const config = loadConfig();
     const webpackProdConfig = getWebpackProdConfig({
       ...config,

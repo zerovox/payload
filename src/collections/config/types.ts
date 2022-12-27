@@ -267,8 +267,8 @@ export type CollectionConfig = {
     readVersions?: Access;
     update?: Access;
     delete?: Access;
-    admin?: (args?: any) => boolean | Promise<boolean>;
-    unlock?: Access;
+    admin?: (args: { req: PayloadRequest }) => boolean | Promise<boolean>;
+    unlock?: (args: { req: PayloadRequest }) => boolean | Promise<boolean>;
   };
   /**
    * Collection login options

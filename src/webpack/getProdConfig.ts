@@ -5,13 +5,16 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import path from 'path';
 import { Configuration } from 'webpack';
 import { SanitizedConfig } from '../config/types';
-import getBaseConfig from './getBaseConfig';
+import getBaseWebpackConfig, { pathToAdminFolder } from './getBaseConfig';
 
 export default (payloadConfig: SanitizedConfig): Configuration => {
-  const baseConfig = getBaseConfig(payloadConfig) as any;
+  const baseConfig = getBaseWebpackConfig(payloadConfig) as any;
 
-  let config: Configuration = {
+  let webpackConfig: Configuration = {
     ...baseConfig,
+    entry: {
+      main: [pathToAdminFolder],
+    },
     output: {
       publicPath: `${payloadConfig.routes.admin}/`,
       path: path.resolve(process.cwd(), 'build'),
@@ -20,6 +23,13 @@ export default (payloadConfig: SanitizedConfig): Configuration => {
     },
     mode: 'production',
     stats: 'errors-only',
+    plugins: [
+      ...baseConfig.plugins,
+      new MiniCSSExtractPlugin({
+        filename: '[name].css',
+        ignoreOrder: true,
+      }),
+    ],
     optimization: {
       minimizer: [new TerserJSPlugin({}), new CssMinimizerPlugin()],
       splitChunks: {
@@ -33,40 +43,15 @@ export default (payloadConfig: SanitizedConfig): Configuration => {
         },
       },
     },
-    plugins: [
-      ...baseConfig.plugins,
-      new MiniCSSExtractPlugin({
-        filename: '[name].css',
-        ignoreOrder: true,
-      }),
-    ],
   };
 
-  config.module.rules.push({
-    test: /\.(scss|css)$/,
-    sideEffects: true,
-    use: [
-      MiniCSSExtractPlugin.loader,
-      require.resolve('css-loader'),
-      {
-        loader: require.resolve('postcss-loader'),
-        options: {
-          postcssOptions: {
-            plugins: [require.resolve('postcss-preset-env')],
-          },
-        },
-      },
-      require.resolve('sass-loader'),
-    ],
-  });
-
   if (process.env.PAYLOAD_ANALYZE_BUNDLE) {
-    config.plugins.push(new BundleAnalyzerPlugin());
+    webpackConfig.plugins.push(new BundleAnalyzerPlugin());
   }
 
   if (payloadConfig.admin.webpack && typeof payloadConfig.admin.webpack === 'function') {
-    config = payloadConfig.admin.webpack(config);
+    webpackConfig = payloadConfig.admin.webpack(webpackConfig);
   }
 
-  return config;
+  return webpackConfig;
 };
