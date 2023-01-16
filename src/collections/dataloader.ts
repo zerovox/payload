@@ -78,6 +78,7 @@ const batchAndLoadDocs = (req: PayloadRequest): BatchLoadFn<string, TypeWithID> 
       const request = { ...req };
       // override payloadDataLoader to prevent infinite recursion
       request.payloadDataLoader = {
+        ...req.payloadDataLoader,
         load: (key: LoadArgs) => {
           const stringKey = stringifyLoadArgs(key);
           if (allKeysInBatch.has(stringKey)) {
@@ -85,7 +86,8 @@ const batchAndLoadDocs = (req: PayloadRequest): BatchLoadFn<string, TypeWithID> 
           }
           return req.payloadDataLoader.load(key);
         },
-
+        // use our new load function
+        loadAll: (args: Array<LoadArgs>) => Promise.all(args.map((key) => request.payloadDataLoader.load(key))),
       };
 
       const result = await payload.find({
@@ -104,7 +106,7 @@ const batchAndLoadDocs = (req: PayloadRequest): BatchLoadFn<string, TypeWithID> 
         showHiddenFields: Boolean(showHiddenFields),
         disableErrors: true,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-ignore TODO: fix this
         req: request,
       });
 
@@ -152,7 +154,7 @@ const batchAndLoadDocs = (req: PayloadRequest): BatchLoadFn<string, TypeWithID> 
   return results;
 };
 
-export type LoadArgs = {
+export type LoadArgs = string | {
   collection: string;
   id: string | number;
   depth: number;
@@ -164,6 +166,9 @@ export type LoadArgs = {
 }
 
 function stringifyLoadArgs(args: LoadArgs): string {
+  if (typeof args === 'string') {
+    return args;
+  }
   const { collection, id, depth, currentDepth, locale, fallbackLocale, overrideAccess, showHiddenFields } = args;
   return JSON.stringify([collection, id, depth, currentDepth, locale, fallbackLocale, overrideAccess, showHiddenFields]);
 }
@@ -174,8 +179,16 @@ export const getDataLoader = (req: PayloadRequest) => {
   const { payload } = req;
   // wrap the load function to ensure we always stringify the key
   // with the correct fields
+  // we also need to check if the id is valid
+  // for backwards compatibility we need to support strings as well
   function load(key: LoadArgs): Promise<TypeWithID> {
-    const { collection, id } = key;
+    let collection: string;
+    let id: string | number;
+    if (typeof key === 'string') {
+      [collection, id] = JSON.parse(key);
+    } else {
+      ({ collection, id } = key);
+    }
     const idField = payload.collections?.[collection].config.fields.find((field) => fieldAffectsData(field) && field.name === 'id');
     if (!isValidID(id, getIDType(idField))) {
       throw new Error(`Invalid ID ${id} for collection ${collection}`);
@@ -183,8 +196,11 @@ export const getDataLoader = (req: PayloadRequest) => {
     return dataloader.load(stringifyLoadArgs(key));
   }
 
-  // we only support load for now
   return {
     load,
+    loadAll: (keys: Array<LoadArgs>) => Promise.all(keys.map(load)),
+    clear: dataloader.clear,
+    clearAll: dataloader.clearAll,
+    prime: dataloader.prime,
   };
 };
