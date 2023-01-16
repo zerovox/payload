@@ -179,14 +179,14 @@ function buildObjectType({
         args: uploadArgs,
         type,
         extensions: { complexity: 20 },
-        async resolve(parent, args, context) {
+        async resolve(parent, args, context: { req: PayloadRequest }) {
           const value = parent[field.name];
           const locale = args.locale || context.req.locale;
           const fallbackLocale = args.fallbackLocale || context.req.fallbackLocale;
           const id = value;
 
           if (id) {
-            const relatedDocument = await (context.req as PayloadRequest).payloadDataLoader.load(
+            const relatedDocument = await (context.req).payloadDataLoader.load(
               {
                 collection: relatedCollectionSlug,
                 id,
@@ -294,7 +294,7 @@ function buildObjectType({
           },
         });
       } else {
-        ({ type } = payload.collections[relationTo as string].graphQL);
+        ({ type } = payload.collections[relationTo].graphQL);
       }
 
       // If the relationshipType is undefined at this point,
@@ -330,11 +330,13 @@ function buildObjectType({
           forceNullable,
         ),
         extensions: { complexity: 10 },
-        async resolve(parent, args, context) {
+        async resolve(parent, args: { locale: string, fallbackLocale: string }, context: { req: PayloadRequest }) {
           const value = parent[field.name];
           const locale = args.locale || context.req.locale;
           const fallbackLocale = args.fallbackLocale || context.req.fallbackLocale;
-          let relatedCollectionSlug = field.relationTo;
+          let relatedCollectionSlug: string;
+
+          if (typeof field.relationTo === 'string') relatedCollectionSlug = field.relationTo;
 
           if (hasManyValues) {
             const results = [];
@@ -342,16 +344,18 @@ function buildObjectType({
 
             const createPopulationPromise = async (relatedDoc, i) => {
               let id = relatedDoc;
-              let collectionSlug = field.relationTo;
+              let collectionSlug: string;
+
+              if (typeof field.relationTo === 'string') collectionSlug = field.relationTo;
 
               if (isRelatedToManyCollections) {
                 collectionSlug = relatedDoc.relationTo;
                 id = relatedDoc.value;
               }
 
-              const result = await (context.req as PayloadRequest).payloadDataLoader.load(
+              const result = await (context.req).payloadDataLoader.load(
                 {
-                  collection: collectionSlug as string,
+                  collection: collectionSlug,
                   id,
                   locale,
                   fallbackLocale,
@@ -396,9 +400,9 @@ function buildObjectType({
           if (id) {
             id = id.toString();
 
-            const relatedDocument = await (context.req as PayloadRequest).payloadDataLoader.load(
+            const relatedDocument = await (context.req).payloadDataLoader.load(
               {
-                collection: relatedCollectionSlug as string,
+                collection: relatedCollectionSlug,
                 id,
                 locale,
                 fallbackLocale,
