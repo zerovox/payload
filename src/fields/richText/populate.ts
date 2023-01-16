@@ -31,14 +31,14 @@ export const populate = async ({
 }): Promise<void> => {
   const dataRef = data as Record<string, unknown>;
 
-  const doc = await req.payload.findByID({
-    req,
+  const doc = await req.payloadDataLoader.load({
     collection: collection.config.slug,
     id,
-    currentDepth: currentDepth + 1,
-    overrideAccess: typeof overrideAccess === 'undefined' ? false : overrideAccess,
-    disableErrors: true,
     depth,
+    currentDepth: currentDepth + 1,
+    locale: req.locale,
+    fallbackLocale: req.fallbackLocale,
+    overrideAccess: typeof overrideAccess === 'undefined' ? false : overrideAccess,
     showHiddenFields,
   });
 

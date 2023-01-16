@@ -50,6 +50,7 @@ import { Payload } from '../..';
 import buildWhereInputType from './buildWhereInputType';
 import buildBlockType from './buildBlockType';
 import isFieldNullable from './isFieldNullable';
+import { PayloadRequest } from '../../express/types';
 
 type LocaleInputType = {
   locale: {
@@ -185,16 +186,18 @@ function buildObjectType({
           const id = value;
 
           if (id) {
-            const relatedDocument = await context.req.payloadDataLoader.load(JSON.stringify([
-              relatedCollectionSlug,
-              id,
-              0,
-              0,
-              locale,
-              fallbackLocale,
-              false,
-              false,
-            ]));
+            const relatedDocument = await (context.req as PayloadRequest).payloadDataLoader.load(
+              {
+                collection: relatedCollectionSlug,
+                id,
+                locale,
+                fallbackLocale,
+                currentDepth: 0,
+                depth: 0,
+                showHiddenFields: false,
+                overrideAccess: false,
+              },
+            );
 
             return relatedDocument || null;
           }
@@ -346,16 +349,18 @@ function buildObjectType({
                 id = relatedDoc.value;
               }
 
-              const result = await context.req.payloadDataLoader.load(JSON.stringify([
-                collectionSlug,
-                id,
-                0,
-                0,
-                locale,
-                fallbackLocale,
-                false,
-                false,
-              ]));
+              const result = await (context.req as PayloadRequest).payloadDataLoader.load(
+                {
+                  collection: collectionSlug as string,
+                  id,
+                  locale,
+                  fallbackLocale,
+                  currentDepth: 0,
+                  depth: 0,
+                  showHiddenFields: false,
+                  overrideAccess: false,
+                },
+              );
 
               if (result) {
                 if (isRelatedToManyCollections) {
@@ -391,16 +396,18 @@ function buildObjectType({
           if (id) {
             id = id.toString();
 
-            const relatedDocument = await context.req.payloadDataLoader.load(JSON.stringify([
-              relatedCollectionSlug,
-              id,
-              0,
-              0,
-              locale,
-              fallbackLocale,
-              false,
-              false,
-            ]));
+            const relatedDocument = await (context.req as PayloadRequest).payloadDataLoader.load(
+              {
+                collection: relatedCollectionSlug as string,
+                id,
+                locale,
+                fallbackLocale,
+                currentDepth: 0,
+                depth: 0,
+                showHiddenFields: false,
+                overrideAccess: false,
+              },
+            );
 
             if (relatedDocument) {
               if (isRelatedToManyCollections) {

@@ -1,19 +1,18 @@
 import { Request } from 'express';
 import type { i18n as Ii18n, TFunction } from 'i18next';
-import DataLoader from 'dataloader';
 import { UploadedFile } from 'express-fileupload';
 import { Payload } from '../index';
 import { Collection } from '../collections/config/types';
 import { User } from '../auth/types';
 import { Document } from '../types';
-import { TypeWithID } from '../globals/config/types';
+import { getDataLoader } from '../collections/dataloader';
 
 /** Express request with some Payload related context added */
 export declare type PayloadRequest<U = any> = Request & {
   /** The global payload object */
   payload: Payload;
   /** Optimized document loader */
-  payloadDataLoader: DataLoader<string, TypeWithID>;
+  payloadDataLoader: ReturnType<typeof getDataLoader>;
   /**
    * The requested locale if specified
    * Only available for localised collections
