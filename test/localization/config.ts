@@ -1,6 +1,7 @@
 import { buildConfig } from '../buildConfig';
 import { devUser } from '../credentials';
 import { ArrayCollection } from './collections/Array';
+import { BasicCollection, basicCollectionSlug } from './collections/Basic';
 import { LocalizedPost, RelationshipLocalized } from './payload-types';
 import {
   defaultLocale,
@@ -125,13 +126,13 @@ export default buildConfig({
         {
           name: 'localizedRelationMultiRelationTo',
           type: 'relationship',
-          relationTo: [slug, 'dummy'],
+          relationTo: [slug, basicCollectionSlug],
         },
         // Relation multiple relationTo hasMany
         {
           name: 'localizedRelationMultiRelationToHasMany',
           type: 'relationship',
-          relationTo: [slug, 'dummy'],
+          relationTo: [slug, basicCollectionSlug],
           hasMany: true,
         },
       ],
@@ -155,28 +156,19 @@ export default buildConfig({
         {
           name: 'relationMultiRelationTo',
           type: 'relationship',
-          relationTo: [slug, 'dummy'],
+          relationTo: [slug, basicCollectionSlug],
           localized: true,
         },
         {
           name: 'relationMultiRelationToHasMany',
           type: 'relationship',
-          relationTo: [slug, 'dummy'],
+          relationTo: [slug, basicCollectionSlug],
           hasMany: true,
           localized: true,
         },
       ],
     },
-    {
-      slug: 'dummy',
-      access: openAccess,
-      fields: [
-        {
-          name: 'name',
-          type: 'text',
-        },
-      ],
-    },
+    BasicCollection,
   ],
   globals: [
     {
@@ -219,6 +211,13 @@ export default buildConfig({
         email: devUser.email,
         password: devUser.password,
         relation: localizedPost.id,
+      },
+    });
+
+    await payload.create({
+      collection: basicCollectionSlug,
+      data: {
+        title: 'basic',
       },
     });
 

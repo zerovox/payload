@@ -1,4 +1,5 @@
 import type { CollectionConfig } from '../../../../src/collections/config/types';
+import { basicCollectionSlug } from '../Basic';
 
 export const arrayCollectionSlug = 'array-fields';
 
@@ -13,7 +14,11 @@ export const ArrayCollection: CollectionConfig = {
         {
           name: 'text',
           type: 'text',
-          required: true,
+        },
+        {
+          name: 'relatedItem',
+          type: 'relationship',
+          relationTo: basicCollectionSlug,
         },
       ],
     },

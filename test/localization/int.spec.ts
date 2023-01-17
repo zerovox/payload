@@ -23,6 +23,7 @@ import {
 } from './shared';
 import type { Where } from '../../src/types';
 import { arrayCollectionSlug } from './collections/Array';
+import { basicCollectionSlug } from './collections/Basic';
 
 const collection = slug;
 
@@ -717,6 +718,38 @@ describe('Localization', () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       expect(updatedSpanishDoc.items[0].text).toStrictEqual(englishTitle);
+    });
+
+    it('should fulfill localized arrays inner relationship fields', async () => {
+      const basicDocTitle = 'Basic Related Doc EN';
+
+      const basicDoc = await payload.create({
+        collection: basicCollectionSlug,
+        data: {
+          title: basicDocTitle,
+        },
+      });
+
+      const withRelationshipArrayItemDoc = await payload.create({
+        collection: arrayCollectionSlug,
+        data: {
+          items: [
+            {
+              text: 'required array field',
+              relatedItem: basicDoc.id,
+            },
+          ],
+        },
+      });
+
+      const allLocaleLocalAPI = await payload.findByID({
+        collection: arrayCollectionSlug,
+        id: withRelationshipArrayItemDoc.id,
+        locale: 'all',
+        depth: 2,
+      });
+
+      expect(allLocaleLocalAPI.items.en[0].relatedItem.title).toStrictEqual(basicDocTitle);
     });
   });
 });
