@@ -18,7 +18,7 @@ export const ArrayCollection: CollectionConfig = {
       ],
     },
     {
-      name: 'drinks',
+      name: 'localizedInnerFields',
       type: 'array',
       fields: [
         {
@@ -27,11 +27,6 @@ export const ArrayCollection: CollectionConfig = {
           localized: true,
         },
       ],
-    },
-    {
-      name: 'text',
-      type: 'text',
-      localized: true,
     },
   ],
 };

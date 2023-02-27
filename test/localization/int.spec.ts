@@ -747,7 +747,7 @@ describe('Localization', () => {
         locale: defaultLocale,
         collection: arrayCollectionSlug,
         data: {
-          drinks: [
+          localizedInnerFields: [
             {
               name: englishTitle,
             },
@@ -761,9 +761,9 @@ describe('Localization', () => {
         id: ogDoc.id,
         collection: arrayCollectionSlug,
         data: {
-          drinks: [
+          localizedInnerFields: [
             {
-              id: ogDoc.drinks[0].id,
+              id: ogDoc.localizedInnerFields[0].id,
               name: spanishTitle,
             },
           ],
@@ -781,8 +781,8 @@ describe('Localization', () => {
         locale: defaultLocale,
       });
 
-      expect(enLocalized.docs[0].drinks[0].name).toStrictEqual(englishTitle);
-      expect(esLocalized.docs[0].drinks[0].name).toStrictEqual(spanishTitle);
+      expect(enLocalized.docs[0].localizedInnerFields[0].name).toStrictEqual(englishTitle);
+      expect(esLocalized.docs[0].localizedInnerFields[0].name).toStrictEqual(spanishTitle);
     });
   });
 });
