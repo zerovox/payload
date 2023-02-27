@@ -17,5 +17,21 @@ export const ArrayCollection: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'drinks',
+      type: 'array',
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          localized: true,
+        },
+      ],
+    },
+    {
+      name: 'text',
+      type: 'text',
+      localized: true,
+    },
   ],
 };
