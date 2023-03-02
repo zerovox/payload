@@ -11,6 +11,10 @@
     position: relative;
   }
 
+  &__toggle {
+    cursor: pointer !important;
+  }
+
   .btn {
     margin-right: $baseline;
   }
