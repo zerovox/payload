@@ -41,11 +41,11 @@ const connectMongoose = async (
   try {
     await mongoose.connect(urlToConnect, connectionOptions);
 
-    if (process.env.PAYLOAD_DROP_DATABASE === 'true') {
-      logger.info('---- DROPPING DATABASE ----');
-      await mongoose.connection.dropDatabase();
-      logger.info('---- DROPPED DATABASE ----');
-    }
+    // if (process.env.PAYLOAD_DROP_DATABASE === 'true') {
+    //   logger.info('---- DROPPING DATABASE ----');
+    //   await mongoose.connection.dropDatabase();
+    //   logger.info('---- DROPPED DATABASE ----');
+    // }
 
     logger.info(successfulConnectionMessage);
   } catch (err) {

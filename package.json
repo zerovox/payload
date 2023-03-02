@@ -35,6 +35,7 @@
     "build:tsc": "tsc",
     "build:components": "webpack --config dist/webpack/components.config.js",
     "build": "yarn copyfiles && yarn build:tsc && yarn build:components",
+    "build-npm": "npm run copyfiles && npm run build:tsc && npm run build:components",
     "build:watch": "nodemon --watch 'src/**' --ext 'ts,tsx' --exec \"yarn build:tsc\"",
     "dev": "nodemon",
     "dev:generate-types": "ts-node -T ./test/generateTypes.ts",

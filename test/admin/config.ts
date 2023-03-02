@@ -205,13 +205,17 @@ export default buildConfig({
     },
   ],
   onInit: async (payload) => {
-    await payload.create({
-      collection: 'users',
-      data: {
-        email: devUser.email,
-        password: devUser.password,
-      },
-    });
+    try {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: devUser.email,
+          password: devUser.password,
+        },
+      });
+    } catch (error) {
+      // continue
+    }
 
     await mapAsync([...Array(11)], async () => {
       await payload.create({
