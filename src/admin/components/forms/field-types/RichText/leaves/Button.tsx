@@ -7,7 +7,7 @@ import '../buttons.scss';
 
 const baseClass = 'rich-text__button';
 
-const LeafButton = ({ format, children }) => {
+const LeafButton:React.FC<{ children: React.ReactNode; format: string }> = ({ format, children }) => {
   const editor = useSlate();
 
   return (
